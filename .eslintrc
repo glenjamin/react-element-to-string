@@ -1,0 +1,6 @@
+{
+    "extends": "@glenjamin",
+    "env": {
+        "node": true
+    }
+}

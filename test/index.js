@@ -1,210 +1,144 @@
-import React from 'react';
-import jsxToString from '../src/index';
-import test from 'tape';
+var React = require('react');
+var ReactElementToString = require('../');
 
-let Basic = React.createClass({
-  render() {
+var expect = require('chai').expect;
+
+var str = ReactElementToString;
+
+var Basic = React.createClass({
+  render: function() {
     return (
       <div />
     );
   }
 });
 
-let DefaultProp = React.createClass({
+var DefaultProp = React.createClass({
 
-  getDefaultProps() {
+  getDefaultProps: function() {
     return {
       test2: 'abc'
     };
   },
 
-  render() {
+  render: function() {
     return (
       <div />
     );
   }
 });
 
-let BasicChild = React.createClass({
-  render() {
+var BasicChild = React.createClass({
+  render: function() {
     return (
       <div />
     );
   }
 });
 
-test('test a basic react component', function(t) {
-  t.plan(1);
+describe("ReactElementToString", function() {
+  it('should string a basic react component', function() {
+    expect(str(<Basic />)).to.eql('<Basic />');
+  });
 
-  let output = jsxToString(<Basic />);
+  it('should include simple props', function() {
+    expect(
+      str(<Basic
+        test="abc" test2={4} test4={true}
+        test5={{ abc: "abc" }} test6=""
+      />)
+    ).to.eql(
+      '<Basic test="abc" test2={4} test4={true}' +
+      ' test5={{"abc": "abc"}} test6="" />'
+    );
+  });
 
-  t.equal(output, '<Basic />');
-});
+  it('should ignore default props', function() {
+    expect(str(<DefaultProp test="abc" />))
+      .to.eql('<DefaultProp test="abc" />');
+  });
 
-test('test a basic react component with default props', function(t) {
-  t.plan(1);
+  it('should show anonymous functions', function() {
+    var func = function() { return 1; };
+    expect(str(<Basic test={func} />))
+      .to.eql('<Basic test={function()} />');
+  });
 
-  let output = jsxToString(<DefaultProp test="abc" />);
+  it('should show named functions', function() {
+    var func = function func() { return 1; };
+    expect(str(<Basic test={func} />))
+      .to.eql('<Basic test={func()} />');
+  });
 
-  t.equal(output, '<DefaultProp test="abc" />');
-});
+  it('should show ReactElement props', function() {
+    expect(str(<Basic test1={<Basic />} />))
+      .to.eql('<Basic test1={<Basic />} />');
+  });
 
-test('test a react component with basic props', function(t) {
-  t.plan(1);
+  it('should show ReactElement with ReactElement children', function() {
+    expect(str(<Basic><hr /><BasicChild /></Basic>))
+      .to.eql('<Basic>\n  <hr />\n  <BasicChild />\n</Basic>');
+  });
 
-  let output = jsxToString(
-    <Basic test="abc" test2={4} test4={true}
-      test5={{abc: "abc"}} test6="" />
-  );
+  it('should show ReactElement with text children', function() {
+    expect(str(<Basic>Stuff{"&"}Nonsense</Basic>))
+      .to.eql('<Basic>\n  Stuff\n  &\n  Nonsense\n</Basic>');
+  });
 
-  t.equal(output, '<Basic test="abc" test2={4} test4={true} test5={{"abc": "abc"}} test6="" />');
-});
-
-test('test a react component with function props', function(t) {
-  t.plan(1);
-
-  let _testCallBack = function () {
-    //no-op
-  };
-  let output = jsxToString(<Basic test1={_testCallBack} />);
-
-  t.equal(output, '<Basic test1={...} />');
-});
-
-test('test a react component with react props', function(t) {
-  t.plan(1);
-
-  let _testCallBack = function () {
-    //no-op
-  };
-  let output = jsxToString(<Basic test1={<Basic />} />);
-
-  t.equal(output, '<Basic test1={<Basic />} />');
-});
-
-test('test a react component with custom name function', function(t) {
-  t.plan(1);
-
-  let _testCallBack1 = function () {
-    //no-op
-  };
-
-  let _testCallBack2 = function () {
-    //no-op
-  };
-
-  let output = jsxToString(
-    <Basic test1={_testCallBack1} test2={_testCallBack2} />, {
-      keyValueOverride: {
-        test1: '_testCallBack1',
-        test2: '_testCallBack2'
-      }
-    }
-  );
-
-  t.equal(output, '<Basic test1={_testCallBack1} test2={_testCallBack2} />');
-});
-
-test('test a react component with react children', function(t) {
-  t.plan(1);
-
-  let output = jsxToString(
-    <Basic>
-      <BasicChild />
-    </Basic>
-  );
-
-  t.equal(output, '<Basic>\n  <BasicChild />\n</Basic>');
-});
-
-test('test a react component with text children', function(t) {
-  t.plan(1);
-
-  let output = jsxToString(
-    <Basic>Test</Basic>
-  );
-
-  t.equal(output, '<Basic>\n  Test\n</Basic>');
-});
-
-test('test a react component with ignore props', function(t) {
-  t.plan(1);
-
-  let output = jsxToString(
-    <Basic test1="ignore">Test</Basic>,
-    {
-      ignoreProps: ['test1']
-    }
-  );
-
-  t.equal(output, '<Basic>\n  Test\n</Basic>');
-});
-
-
-test('test a react component with multiple children', function(t) {
-  t.plan(1);
-
-  let output = jsxToString(
-    <Basic>
-      <BasicChild>
-        <BasicChild>
-          <BasicChild>
-            Title
-          </BasicChild>
-          <BasicChild>
-            Title 2
-          </BasicChild>
+  it('should show ReactElement with many children', function() {
+    var output = str(
+      <Basic>
+        <BasicChild prop="thing">
+          <div>
+            <BasicChild row={3}>
+              Title
+            </BasicChild>
+            <p>
+              Title 2
+            </p>
+          </div>
         </BasicChild>
-      </BasicChild>
-    </Basic>
-  );
+      </Basic>
+    );
 
-  t.equal(output, '<Basic>\n  <BasicChild>\n    <BasicChild>\n      <BasicChild>\n        Title\n      </BasicChild>\n      <BasicChild>\n        Title 2\n      </BasicChild>\n    </BasicChild>\n  </BasicChild>\n</Basic>');
-});
+    expect(output).to.eql(
+      '<Basic>\n' +
+      '  <BasicChild prop="thing">\n' +
+      '    <div>\n' +
+      '      <BasicChild row={3}>\n' +
+      '        Title\n' +
+      '      </BasicChild>\n' +
+      '      <p>\n' +
+      '        Title 2\n' +
+      '      </p>\n' +
+      '    </div>\n' +
+      '  </BasicChild>\n' +
+      '</Basic>'
+    );
+  });
 
-test('test a react component with a null children', function(t) {
-  t.plan(1);
+  it('should handle null and otherwise empty children', function() {
+    var output = str(<p>
+      a {""}
+      b {0}
+      c {false}
+      d {null}
+    </p>);
 
-  let output = jsxToString(
-    <Basic>
-      <BasicChild>
-        <BasicChild>
-          {null}
-          <BasicChild>
-            Title 2
-          </BasicChild>
-        </BasicChild>
-      </BasicChild>
-    </Basic>
-  );
+    expect(output).to.eql(
+      '<p>\n' +
+      '  a \n' +
+      '  b \n' +
+      '  0\n' +
+      '  c \n' +
+      '  d \n' +
+      '</p>'
+    );
+  });
 
-  t.equal(output, '<Basic>\n  <BasicChild>\n    <BasicChild>\n      <BasicChild>\n        Title 2\n      </BasicChild>\n    </BasicChild>\n  </BasicChild>\n</Basic>');
-});
+  it('should work with raw createElement as well', function() {
+    expect(str(React.createElement(Basic, { a: 1 }, React.createElement('hr'))))
+      .to.eql('<Basic a={1}>\n  <hr />\n</Basic>');
+  });
 
-test('test a react component with spread operator', function(t) {
-  t.plan(1);
-
-  let someProps = {
-    prop1: true,
-    prop2: "active"
-  };
-
-  let output = jsxToString(
-    <Basic {...someProps}/>
-  );
-
-  t.equal(output, '<Basic prop1={true} prop2="active" />');
-});
-
-test('test a react component with custom displayName', function(t) {
-  t.plan(1);
-
-  let output = jsxToString(
-    <Basic />,
-    {
-      displayName: 'CustomDisplayName'
-    }
-  );
-
-  t.equal(output, '<CustomDisplayName />');
 });
