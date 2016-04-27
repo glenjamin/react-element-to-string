@@ -80,6 +80,23 @@ describe("ReactElementToString", function() {
       .to.eql('<Basic>\n  <hr />\n  <BasicChild />\n</Basic>');
   });
 
+  it('should handle function children', function() {
+    function Func() { return <hr />; }
+    expect(str(<Basic><Func /></Basic>))
+      .to.eql('<Basic>\n  <Func />\n</Basic>');
+  });
+
+  it('should handle component without displayName children', function() {
+    var A = (function() {
+      // eslint-disable-next-line react/display-name
+      return React.createClass({
+        render: function() { return null; }
+      });
+    })();
+    expect(str(<Basic><A /></Basic>))
+      .to.eql('<Basic>\n  <Unknown />\n</Basic>');
+  });
+
   it('should show ReactElement with text children', function() {
     expect(str(<Basic>Stuff{"&"}Nonsense</Basic>))
       .to.eql('<Basic>\n  Stuff\n  &\n  Nonsense\n</Basic>');

@@ -15,7 +15,11 @@ function ReactElementToString(element) {
 }
 
 function showName(element) {
-  return element.type.displayName || element.type.name || element.type;
+  var type = element.type;
+  if (type.displayName) return type.displayName;
+  if (type.name) return type.name;
+  if (typeof type == 'string') return type;
+  return 'Unknown';
 }
 
 function showProps(element) {
