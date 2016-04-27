@@ -1,6 +1,6 @@
 {
   "name": "react-element-to-string",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Convert a ReactElement into a nice string useful for debugging",
   "main": "index.js",
   "scripts": {
