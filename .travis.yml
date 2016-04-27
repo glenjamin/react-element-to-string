@@ -1,8 +1,12 @@
 language: node_js
 node_js:
-- "0.12"
 - "4"
-- "5"
+- "node"
 script:
   - npm run lint
   - npm test
+env:
+  - REACT=0.13
+  - REACT=0.14
+  - REACT=15.0
+before_script: "npm install react@$REACT"
