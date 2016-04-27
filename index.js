@@ -55,7 +55,12 @@ function showChildren(element) {
   var children = element.props.children;
   if (!children) return '';
 
-  var shownChildren = React.Children.map(children, showChild);
+  // Currently we support React 0.13, where React.Children.map returns an
+  // opaque data structure rather than an array. So we build one via forEach.
+  var shownChildren = [];
+  React.Children.forEach(children, function(child) {
+    shownChildren.push(showChild(child));
+  });
   var content = shownChildren.filter(Boolean).join("\n");
 
   return "\n" + indentString(content, ' ', 2) + "\n";
