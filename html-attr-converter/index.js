@@ -106,7 +106,7 @@ var map ={
 };
 
 var convert = function (attr) {
-  return map[key] || attr;
+  return map[attr] || attr;
 };
 
 module.exports = convert;
