@@ -1,6 +1,7 @@
 var React = require('react');
 var stringify = require('json-stringify-pretty-compact');
 var indentString = require('indent-string');
+var convert = require('./html-attr-converter/index.js');
 
 function ReactElementToString(element) {
   var name = showName(element);
@@ -34,6 +35,7 @@ function showProps(element) {
     }
 
     if (typeof val == 'string') {
+      prop = convert(prop);
       return ' ' + prop + '=' + JSON.stringify(val);
     }
 
