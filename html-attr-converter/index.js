@@ -73,7 +73,7 @@ var map = {
   "preload": "preload",
   "radioGroup": "radiogroup",
   "readOnly": "readonly",
-  "rel": "rel",;
+  "rel": "rel",
   "required": "required",
   "reversed": "reversed",
   "rows": "rows",
@@ -105,7 +105,7 @@ var map = {
   "wrap": "wrap"
 };
 
-var convert = function (attr) {
+var convert = function(attr) {
   return map[attr] || attr;
 };
 

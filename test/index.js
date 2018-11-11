@@ -59,13 +59,17 @@ describe("ReactElementToString", function() {
   });
 
   it('should show anonymous functions', function() {
-    var func = function() { return 1; };
+    var func = function() {
+      return 1;
+    };
     expect(str(<Basic test={func} />))
       .to.eql('<Basic test={function()} />');
   });
 
   it('should show named functions', function() {
-    var func = function func() { return 1; };
+    var func = function func() {
+      return 1;
+    };
     expect(str(<Basic test={func} />))
       .to.eql('<Basic test={func()} />');
   });
@@ -81,7 +85,9 @@ describe("ReactElementToString", function() {
   });
 
   it('should handle function children', function() {
-    function Func() { return <hr />; }
+    function Func() {
+      return <hr />;
+    }
     expect(str(<Basic><Func /></Basic>))
       .to.eql('<Basic>\n  <Func />\n</Basic>');
   });
